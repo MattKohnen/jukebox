@@ -37,8 +37,7 @@ const expected = {
     ]
 }
 
-// TODO: Fix to work with async
-
-test('reads in & processes a file', () => {
-    expect(processData(filePath)).toStrictEqual(expected)
+test('reads in & processes a file', async () => {
+    const data = await processData(filePath, 'people')
+    expect(data).toStrictEqual(expected)
 })

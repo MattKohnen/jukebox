@@ -1,6 +1,5 @@
-const { createReadStream } = require('fs')
-const { createInterface } = require('readline')
-const { once } = require('events')
+const fs = require('fs')
+const readline = require('readline')
 
 const removeDelimiters = (line, ...delimiters) => {
 
@@ -9,37 +8,39 @@ const removeDelimiters = (line, ...delimiters) => {
     return line.replace(/,|\|/g, '').replace(/\s+/g, ' ').trim()
 }
 
-// TODO: Break down below function into smaller functions
+const readFile = (filePath) => {
 
-const processData = async function processLineByLine(filePath) {try {
-        const rl = createInterface({
-            crlfDelay: Infinity,
-            input:     createReadStream(filePath),
-        })
-        const dataObject = {'people': []}
+}
 
-        rl.on('line', (line) => {
-            // Process the line.
-            //console.log(`Line from file: ${line}`)
-            //console.log(removeDelimiters(',', line))
-            const cleanLine = removeDelimiters(line,',', '|')
+// TODO: Break down below function into smaller functions(?)
 
-            //console.log('cleanLine:', cleanLine)
+const processData = async function processLineByLine(filePath, dataLabel) {
+    const fileStream = fs.createReadStream(filePath);
+    const rl = readline.createInterface({
+        input:     fileStream,
+        crlfDelay: Infinity,
+    });
+    // Note: we use the crlfDelay option to recognize all instances of CR LF
+    // ('\r\n') in file as a single line break.
+    const label = dataLabel ? dataLabel : 'data'
+    const dataObject = {[label]: []}
 
-            // Add line to stored data object
-            // TODO: Parse line & divvy up into key/vals
-            dataObject.people.push({'person': cleanLine})
-        });
+    for await (const line of rl) {
+        // Each line in file will be successively available here as `line`.
+        //console.log(`Line from file: ${line}`)
+        //console.log(removeDelimiters(',', line))
+        const cleanLine = removeDelimiters(line,',', '|')
 
-        await once(rl, 'close')
+        //console.log('cleanLine:', cleanLine)
 
-        console.log('File processed.')
-
-        console.log(dataObject)
-        return dataObject
-    } catch (err) {
-        console.error(err)
+        // Add line to stored data object
+        // TODO: Parse line & divvy up into key/vals
+        dataObject[label].push({'person': cleanLine})
     }
+
+    //console.log('File processed.')
+    //console.log(dataObject)
+    return dataObject
 }
 
 module.exports = processData

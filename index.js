@@ -18,5 +18,8 @@ log(options)
 // Input: Set of records in 1 of 3 formats
 // Output: Set of records sorted in 1 of 3 ways
 
+// TODO: Add prompt at command line asking for filepath(s)
+// TODO:    Is it possible to have a filepicker ?
+
 const filePath = path.join(__dirname, 'mock_data', 'comma_delimited.txt')
-processData(filePath)
+processData(filePath, 'people')
